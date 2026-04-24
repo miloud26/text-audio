@@ -17,10 +17,12 @@ import {
   ChevronRight,
   Loader2,
   Volume2,
-  Activity
+  Activity,
+  Download,
+  AlertTriangle
 } from 'lucide-react';
 import { analyzeScript, generateEmotionalAudio, ScriptSegment } from './lib/gemini';
-import { playTTSAudio } from './lib/audio';
+import { playTTSAudio, downloadAudioAsWav } from './lib/audio';
 
 export default function App() {
   const [script, setScript] = useState('');
@@ -30,17 +32,20 @@ export default function App() {
   const [voice, setVoice] = useState<'male' | 'female'>('female');
   const [audioBase64, setAudioBase64] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<{ audioContext: AudioContext; source: AudioBufferSourceNode } | null>(null);
 
   const handleAnalyze = async () => {
     if (!script.trim()) return;
     setIsAnalyzing(true);
+    setError(null);
     try {
       const result = await analyzeScript(script);
       setSegments(result);
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      console.error(err);
+      setError("فشل تحليل السكريبت. يرجى المحاولة مرة أخرى.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -49,13 +54,21 @@ export default function App() {
   const handleGenerate = async () => {
     if (segments.length === 0) return;
     setIsGenerating(true);
+    setError(null);
     try {
       const base64 = await generateEmotionalAudio(segments, voice);
       setAudioBase64(base64);
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      console.error(err);
+      setError("فشل إنتاج الصوت. قد يكون هناك ضغط على الخدمة أو مشكلة في الاتصال.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (audioBase64) {
+      downloadAudioAsWav(audioBase64, `VO_Export_${voice}.wav`);
     }
   };
 
@@ -234,6 +247,20 @@ export default function App() {
                 تحويل إلى صوت
               </h2>
 
+              <AnimatePresence>
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3"
+                  >
+                    <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-400">{error}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <ul className="space-y-4 mb-8 text-sm text-[#888]">
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
@@ -245,7 +272,7 @@ export default function App() {
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  تطبيق الاتجاهات الإخراجية
+                  تطوير تعبيرات صوتية واقعية
                 </li>
               </ul>
 
@@ -265,14 +292,25 @@ export default function App() {
                     animate={{ height: 'auto', opacity: 1 }}
                     className="mt-8 pt-8 border-t border-white/5 space-y-6"
                   >
-                    <div className="flex items-center justify-center gap-6">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-center gap-6">
+                        <button 
+                          onClick={togglePlayback}
+                          className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+                        >
+                          {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 translate-x-[-2px] ml-1 rotate-180" />}
+                        </button>
+                      </div>
+                      
                       <button 
-                        onClick={togglePlayback}
-                        className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+                        onClick={handleDownload}
+                        className="w-full flex items-center justify-center gap-2 py-3 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/5 transition-colors"
                       >
-                        {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 translate-x-[-2px] ml-1 rotate-180" />}
+                        <Download className="w-4 h-4" />
+                        تحميل الملف الصوتي (WAV)
                       </button>
                     </div>
+                    
                     <div className="text-center">
                       <p className="text-sm font-mono text-[#F27D26] uppercase tracking-[0.2em] mb-2">Audio Channel 1</p>
                       <p className="text-[10px] text-[#444]">Ready for Export (Linear PCM 24k)</p>
