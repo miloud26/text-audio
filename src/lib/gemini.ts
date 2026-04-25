@@ -11,14 +11,21 @@ export interface ScriptSegment {
 export async function analyzeScript(script: string): Promise<ScriptSegment[]> {
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `You are an expert speech director for professional advertisements. 
-    Analyze the following script for a NATURAL, HUMAN delivery. 
-    Break it down into segments and identify the SUBTLE underlying tone (e.g., thoughtful, authentic, reassuring, clear).
-    Avoid extreme or exaggerated emotions. Focus on how a real professional narrator would speak.
+    contents: `You are a script director for Meta Ads (Facebook/Instagram/TikTok) specializing in the Algerian market. 
+    Analyze this script which is written in ALGERIAN DARIJA (or Arabic for Algerians).
+    
+    Structure the analysis for an advertisement:
+    1. Hook (The first 3 seconds to grab attention).
+    2. Problem/Empathy (Touching the customer's pain point).
+    3. Solution/Value (Presenting the product/service).
+    4. Call to Action (The final push).
+
+    Provide vocal directions in English for the TTS engine to achieve a NATURAL ALGERIAN accent and an ADVERTISING tone. 
+    Avoid robotic or formal Arabic sounds. Use "conversational", "excited but natural", "trustworthy friend" vibes.
     
     Return ONLY a JSON array of objects:
     [
-      { "text": "...", "emotion": "thoughtful", "direction": "warm, steady pace, natural pauses" },
+      { "text": "...", "emotion": "engaging hook", "direction": "energetic, natural Algerian accent, punchy" },
       ...
     ]
 
@@ -32,10 +39,10 @@ export async function analyzeScript(script: string): Promise<ScriptSegment[]> {
   try {
     const text = response.text || "[]";
     const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [{ text: script, emotion: "natural", direction: "conversational and clear" }];
+    return Array.isArray(parsed) ? parsed : [{ text: script, emotion: "natural", direction: "conversational Algerian" }];
   } catch (e) {
     console.error("Failed to parse script analysis", e);
-    return [{ text: script, emotion: "natural", direction: "conversational and clear" }];
+    return [{ text: script, emotion: "natural", direction: "conversational Algerian" }];
   }
 }
 
@@ -43,19 +50,22 @@ export async function generateEmotionalAudio(
   segments: ScriptSegment[],
   voice: "male" | "female"
 ): Promise<string> {
-  // Female: Kore (balanced), Puck (expressive)
-  // Male: Charon (steady), Fenrir (vibrant)
   const voiceName = voice === "female" ? "Kore" : "Charon";
 
-  // Refined prompt for more natural flow
-  const fullPrompt = `Speak the following script in a completely natural, human, and conversational way. 
-  Do NOT over-act or exaggerate the emotions. Use a professional narration style with subtle emphasis where appropriate.
-  Ensure smooth transitions between parts.
+  // Specialized prompt for Algerian Ad delivery
+  const fullPrompt = `Task: Professional Meta Ad Voiceover in Algerian Darija.
+  Tone: Authentic, Modern, and Persuasive. 
+  Accent: Algerian (Natural/Local).
   
-  Script details:
-  ${segments.map(s => `[Tone: ${s.emotion}, Style: ${s.direction}] ${s.text}`).join("\n")}`;
+  Guidelines:
+  - Speak like a real Algerian person in a viral ad, NOT a news reporter.
+  - Follow the segment-specific directions provided.
+  - Ensure the "Hook" segments are very engaging.
+  
+  Script Segments (JSON-informed delivery):
+  ${segments.map(s => `[Niche: ${s.emotion}, Style: ${s.direction}] Text: ${s.text}`).join("\n")}`;
 
-  console.log("Generating natural audio for prompt:", fullPrompt);
+  console.log("Generating Algerian Ad Audio...");
 
   const response = await ai.models.generateContent({
     model: "gemini-3.1-flash-tts-preview",

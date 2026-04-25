@@ -117,7 +117,7 @@ export default function App() {
               <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Al-Sawtify AI</h1>
               <p className="text-[#888] text-sm font-mono uppercase tracking-widest flex items-center gap-2">
                 <Activity className="w-3 h-3 text-[#F27D26]" />
-                تحليل وإنتاج الصوت العاطفي
+                مُنتِج إعلانات Meta بلكنة جزائرية
               </p>
             </div>
           </motion.div>
@@ -264,15 +264,15 @@ export default function App() {
               <ul className="space-y-4 mb-8 text-sm text-[#888]">
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  أصوات بشرية عالية الدقة 24kHz
+                  تحسين مخصص لإعلانات Facebook/Instagram
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  تحليل نبرة الكلام الواقعية
+                  دعم اللكنة الجزائرية (الدارجة) والشعر الشعبي
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  تجنب المبالغة لضمان المصداقية
+                  توزيع الصوت حسب بنية الـ Creative
                 </li>
               </ul>
 
