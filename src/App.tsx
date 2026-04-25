@@ -244,7 +244,7 @@ export default function App() {
 
               <h2 className="text-xl font-bold mb-8 flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-[#F27D26] animate-pulse" />
-                تحويل إلى صوت
+                إنتاج تعليق صوتي واقعي
               </h2>
 
               <AnimatePresence>
@@ -264,15 +264,15 @@ export default function App() {
               <ul className="space-y-4 mb-8 text-sm text-[#888]">
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  محرك توليد 24kHz عالي الجودة
+                  أصوات بشرية عالية الدقة 24kHz
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  تحليل طبقات الصوت والعاطفة
+                  تحليل نبرة الكلام الواقعية
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-1 h-1 rounded-full bg-white/20" />
-                  تطوير تعبيرات صوتية واقعية
+                  تجنب المبالغة لضمان المصداقية
                 </li>
               </ul>
 

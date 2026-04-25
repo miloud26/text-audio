@@ -11,13 +11,14 @@ export interface ScriptSegment {
 export async function analyzeScript(script: string): Promise<ScriptSegment[]> {
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `You are an expert script analyzer for advertisements. 
-    Analyze the following script and break it down into meaningful segments.
-    Identify the emotion (sadness, pain, empathy, hope, solution, etc.) and give specific vocal directions for each segment to achieve a cinematic and emotional effect.
+    contents: `You are an expert speech director for professional advertisements. 
+    Analyze the following script for a NATURAL, HUMAN delivery. 
+    Break it down into segments and identify the SUBTLE underlying tone (e.g., thoughtful, authentic, reassuring, clear).
+    Avoid extreme or exaggerated emotions. Focus on how a real professional narrator would speak.
     
-    Return ONLY a JSON array of objects like this:
+    Return ONLY a JSON array of objects:
     [
-      { "text": "...", "emotion": "painful", "direction": "whisper with deep breath" },
+      { "text": "...", "emotion": "thoughtful", "direction": "warm, steady pace, natural pauses" },
       ...
     ]
 
@@ -31,10 +32,10 @@ export async function analyzeScript(script: string): Promise<ScriptSegment[]> {
   try {
     const text = response.text || "[]";
     const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [{ text: script, emotion: "neutral", direction: "read clearly" }];
+    return Array.isArray(parsed) ? parsed : [{ text: script, emotion: "natural", direction: "conversational and clear" }];
   } catch (e) {
     console.error("Failed to parse script analysis", e);
-    return [{ text: script, emotion: "neutral", direction: "read clearly" }];
+    return [{ text: script, emotion: "natural", direction: "conversational and clear" }];
   }
 }
 
@@ -42,15 +43,19 @@ export async function generateEmotionalAudio(
   segments: ScriptSegment[],
   voice: "male" | "female"
 ): Promise<string> {
-  // Voice mapping: 
-  // Female: Kore (soft), Puck (youthful)
-  // Male: Charon (deep), Fenrir (strong), Zephyr (airy)
+  // Female: Kore (balanced), Puck (expressive)
+  // Male: Charon (steady), Fenrir (vibrant)
   const voiceName = voice === "female" ? "Kore" : "Charon";
 
-  // Construct a prompt for the TTS model that includes directions
-  const fullPrompt = segments.map(s => `Say with ${s.emotion} emotion and ${s.direction} direction: ${s.text}`).join("\n");
+  // Refined prompt for more natural flow
+  const fullPrompt = `Speak the following script in a completely natural, human, and conversational way. 
+  Do NOT over-act or exaggerate the emotions. Use a professional narration style with subtle emphasis where appropriate.
+  Ensure smooth transitions between parts.
+  
+  Script details:
+  ${segments.map(s => `[Tone: ${s.emotion}, Style: ${s.direction}] ${s.text}`).join("\n")}`;
 
-  console.log("Generating audio for prompt:", fullPrompt);
+  console.log("Generating natural audio for prompt:", fullPrompt);
 
   const response = await ai.models.generateContent({
     model: "gemini-3.1-flash-tts-preview",
